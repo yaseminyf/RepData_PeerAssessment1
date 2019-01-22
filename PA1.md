@@ -6,9 +6,7 @@ output:
     keep_md: true
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+
 
 ## Introduction
 This assignment makes use of data from a personal activity monitoring
@@ -30,9 +28,17 @@ We first load the data in the workplace and check out the data structure with
 `str`. Any transformation of data will be done when necessary later in the
 project.
 
-```{r loaddata}
+
+```r
 mydata <- read.csv("./activity.csv")
 str(mydata)
+```
+
+```
+## 'data.frame':	17568 obs. of  3 variables:
+##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ date    : Factor w/ 61 levels "2012-10-01","2012-10-02",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
 ```
 
 ### What is mean total number of steps taken per day?
@@ -47,20 +53,51 @@ smaller, because there are whole days with `NA` values. Since we want to be
 consistent and keep the number of days of observations at `61` for our
 calculations, we chose this approach.
 
-```{r loadlibrary, results='hide'}
+
+```r
 library(dplyr)
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
 library(ggplot2)
 ```
 
-```{r totalsteps}
+
+```r
 # calculate the daily total steps
 dailySteps <- mydata %>% group_by(date) %>% summarize(totalSteps = sum(steps, na.rm = TRUE))
 
 # plot the histogram of total steps
 hist(dailySteps$totalSteps, main = "Histogram of total daily steps", xlab = "Total number of steps" )
+```
 
+![](PA1_files/figure-html/totalsteps-1.png)<!-- -->
+
+```r
 # check out the mean, median and minimum values for daily total steps
 summary(dailySteps$totalSteps)
+```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##       0    6778   10395    9354   12811   21194
 ```
 
 With the choice we made about the missing values, the `mean` total number of
@@ -68,12 +105,18 @@ steps taken daily is `9354` and the `median` is `10395`. If we had filtered out
 the observations that had missing values, then the results would be *different*
 as shown below.
 
-```{r totalsteps2}
+
+```r
 # calculate the daily total steps
 dailySteps2 <- mydata %>% group_by(date) %>% filter(!is.na(steps)) %>% summarize(totalSteps = sum(steps))
 
 # check out the mean, median and minimum values for daily total steps
 summary(dailySteps2$totalSteps)
+```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##      41    8841   10765   10766   13294   21194
 ```
 
 In this case we only have `53` days instead of `61` (i.e. there were `8` days
@@ -86,14 +129,27 @@ We need to make a time series plot (i.e. `type = "l"`) of the 5-minute interval
 (x-axis) and the average number of steps taken, averaged across all days
 (y-axis).
 
-```{r timeseries}
+
+```r
 timeSeries <- mydata %>% group_by(interval) %>% summarize(averageStep = mean(steps, na.rm = TRUE))
 plot(timeSeries$interval, timeSeries$averageStep, type='l', main = "Average daily activity pattern", xlab = "5-minute time interval", ylab = "Average number of steps")
+```
 
+![](PA1_files/figure-html/timeseries-1.png)<!-- -->
+
+```r
 # which 5-min interval on average across all days has maximum steps?
 timeSeries[which.max(timeSeries$averageStep),]
 ```
-```{r changeIntervalFormat}
+
+```
+## # A tibble: 1 x 2
+##   interval averageStep
+##      <int>       <dbl>
+## 1      835        206.
+```
+
+```r
 # to check to which actual time interval a certain time interval belongs to
 newInterval <- function(x) {
     if (nchar(x) == 1) {
@@ -118,6 +174,10 @@ newInterval <- function(x) {
 newInterval(as.character(timeSeries$interval[which.max(timeSeries$averageStep)]))
 ```
 
+```
+## [1] "08:35"
+```
+
 The 5-minute interval, on average across all the days in the data set, that
 contains the maximum number of steps is the interval that starts at `08:35`. 
 
@@ -131,18 +191,20 @@ above.
 Let us calculate what is the total number of observations (i.e. rows) 
 in the data set that have missing values (i.e. `NA`s).
 
-```{r rowsMissingData}
+
+```r
 noStepsData <- sum(is.na(mydata$steps))
 ```
 
-So, a total of `r noStepsData` rows are missing data. 
+So, a total of 2304 rows are missing data. 
 
 We need to devise a strategy for filling in all of the missing values in the
 data set. We will use the `mean` value for that 5-minute interval, where the
 `mean` is *calculated by filtering out the missing value rows*. With these new
 values we will create a new data set with no missing values.
 
-```{r newdataset}
+
+```r
 # filter out the missing value rows and calculate the means for each interval
 intervalMeans <-  mydata %>% group_by(interval) %>% filter(!is.na(steps)) %>% summarize(meanSteps = mean(steps))
 
@@ -156,15 +218,25 @@ intervals, we can plot the histogram of the total number of steps taken each
 day and report the **mean** and **median** total number of steps taken per day
 for the new complete data set.
 
-```{r newhistogram}
+
+```r
 # calculate the new daily total steps
 newDailySteps <- newData %>% group_by(date) %>% summarize(newTotalSteps = sum(steps))
 
 # plot the histogram of total steps
 hist(newDailySteps$newTotalSteps, main = "Histogram of new total daily steps", xlab = "Total number of steps" )
+```
 
+![](PA1_files/figure-html/newhistogram-1.png)<!-- -->
+
+```r
 # check out the mean, median and minimum values for daily total steps
 summary(newDailySteps$newTotalSteps)
+```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##      41    9819   10766   10766   12811   21194
 ```
 
 The new `mean` and `median` values are higher than the estimates from the first
@@ -181,7 +253,8 @@ Let us first create a new factor variable in the data set with two levels:
 day. We will use the `weekdays()` function and 
 the data set with the filled-in missing values for this part.
 
-```{r newfactor}
+
+```r
 newData <- mutate(newData, days = ifelse((weekdays(as.Date(newData$date)) %in% c("Saturday", "Sunday")), "weekend", "weekday"))
 newData$days <- factor(newData$days)
 ```
@@ -190,13 +263,16 @@ Finally, let us make a panel plot containing a time series plot (i.e.
 `type ="l"`) of the 5-minute interval (x-axis) and the average number of steps
 taken, averaged across all weekday days or weekend days (y-axis). 
 
-```{r finalplot}
+
+```r
 newTimeSeries <- newData %>% group_by(interval, days) %>% summarize(averageStep = mean(steps))
 g <- ggplot(data = newTimeSeries, aes(x = interval, y=averageStep))
 g <- g + facet_wrap(.~days) + geom_line()
 g <- g + labs(x = "5-minute time interval", y = "Average number of steps") 
 g + labs(title = "Average number of steps taken across all weekdays and weekend")
 ```
+
+![](PA1_files/figure-html/finalplot-1.png)<!-- -->
 
 We see from these plots that during the weekdays more steps are taken early in
 the morning, whereas during the weekend the subject moves more consistently
