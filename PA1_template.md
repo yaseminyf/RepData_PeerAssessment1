@@ -84,10 +84,14 @@ library(ggplot2)
 dailySteps <- mydata %>% group_by(date) %>% summarize(totalSteps = sum(steps, na.rm = TRUE))
 
 # plot the histogram of total steps
+png("./figure/hist1.png")
 hist(dailySteps$totalSteps, main = "Histogram of total daily steps", xlab = "Total number of steps" )
+dev.off()
 ```
+<center>
+![Histogram of total daily steps](figure/hist1.png)
+</center>
 
-![](PA1_template_files/figure-html/totalsteps-1.png)<!-- -->
 
 ```r
 # check out the mean, median and minimum values for daily total steps
@@ -133,24 +137,16 @@ We need to make a time series plot (i.e. `type = "l"`) of the 5-minute interval
 ```r
 timeSeries <- mydata %>% group_by(interval) %>% summarize(averageStep =
         mean(steps, na.rm = TRUE))
+png("./figure/timeseries1.png")
 plot(timeSeries$interval, timeSeries$averageStep, type='l', 
      main = "Average daily activity pattern", 
      xlab = "5-minute time interval", ylab = "Average number of steps")
+dev.off()
 ```
+<center>
+![Average daily activity pattern](figure/timeseries1.png)
+</center>
 
-![](PA1_template_files/figure-html/timeseries-1.png)<!-- -->
-
-```r
-# which 5-min interval on average across all days has maximum steps?
-timeSeries[which.max(timeSeries$averageStep),]
-```
-
-```
-## # A tibble: 1 x 2
-##   interval averageStep
-##      <int>       <dbl>
-## 1      835        206.
-```
 
 ```r
 # to check to which actual time interval a certain time interval belongs to
@@ -173,6 +169,18 @@ newInterval <- function(x) {
     return(y)
 }
 
+# which 5-min interval on average across all days has maximum steps?
+timeSeries[which.max(timeSeries$averageStep),]
+```
+
+```
+## # A tibble: 1 x 2
+##   interval averageStep
+##      <int>       <dbl>
+## 1      835        206.
+```
+
+```r
 # let us tell the interval that has the maximum number of steps in average
 newInterval(as.character(timeSeries$interval[
                                          which.max(timeSeries$averageStep)]))
@@ -231,11 +239,14 @@ newDailySteps <- newData %>% group_by(date) %>% summarize(newTotalSteps =
                                                               sum(steps))
 
 # plot the histogram of total steps
+png("./figure/hist2.png")
 hist(newDailySteps$newTotalSteps, main = "Histogram of new total daily steps",
      xlab = "Total number of steps" )
+dev.off()
 ```
-
-![](PA1_template_files/figure-html/newhistogram-1.png)<!-- -->
+<center>
+![Histogram of new total daily steps](figure/hist2.png)
+</center>
 
 ```r
 # check out the mean, median and minimum values for daily total steps
@@ -277,13 +288,17 @@ taken, averaged across all weekday days or weekend days (y-axis).
 newTimeSeries <- newData %>% group_by(interval, days) %>% 
                              summarize(averageStep = mean(steps))
 g <- ggplot(data = newTimeSeries, aes(x = interval, y=averageStep))
-g <- g + facet_wrap(.~days) + geom_line()
+g <- g + facet_wrap(.~days) + geom_line() + theme_bw()
 g <- g + labs(x = "5-minute time interval", y = "Average number of steps") 
-g + labs(title = "Average number of steps taken across all weekdays 
-                                          and weekend")
+g <- g + labs(title = "Average number of steps across all weekdays & weekend")
+png("./figure/timeseries2.png")
+plot(g)
+dev.off()
 ```
 
-![](PA1_template_files/figure-html/finalplot-1.png)<!-- -->
+<center>
+![Mean number of steps across all weekdays & weekend](figure/timeseries2.png)
+</center>
 
 We see from these plots that during the weekdays more steps are taken early in
 the morning, whereas during the weekend the subject moves more consistently
