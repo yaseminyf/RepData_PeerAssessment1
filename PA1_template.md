@@ -84,9 +84,14 @@ library(ggplot2)
 dailySteps <- mydata %>% group_by(date) %>% summarize(totalSteps = sum(steps, na.rm = TRUE))
 
 # plot the histogram of total steps
-png("./figure/hist1.png")
+# png("./figure/hist1.png")
 hist(dailySteps$totalSteps, main = "Histogram of total daily steps", xlab = "Total number of steps" )
-dev.off()
+```
+
+![](PA1_template_files/figure-html/totalsteps-1.png)<!-- -->
+
+```r
+# dev.off()
 ```
 <center>
 ![Histogram of total daily steps](figure/hist1.png)
@@ -137,11 +142,16 @@ We need to make a time series plot (i.e. `type = "l"`) of the 5-minute interval
 ```r
 timeSeries <- mydata %>% group_by(interval) %>% summarize(averageStep =
         mean(steps, na.rm = TRUE))
-png("./figure/timeseries1.png")
+# png("./figure/timeseries1.png")
 plot(timeSeries$interval, timeSeries$averageStep, type='l', 
      main = "Average daily activity pattern", 
      xlab = "5-minute time interval", ylab = "Average number of steps")
-dev.off()
+```
+
+![](PA1_template_files/figure-html/timeseries-1.png)<!-- -->
+
+```r
+# dev.off()
 ```
 <center>
 ![Average daily activity pattern](figure/timeseries1.png)
@@ -239,10 +249,15 @@ newDailySteps <- newData %>% group_by(date) %>% summarize(newTotalSteps =
                                                               sum(steps))
 
 # plot the histogram of total steps
-png("./figure/hist2.png")
+# png("./figure/hist2.png")
 hist(newDailySteps$newTotalSteps, main = "Histogram of new total daily steps",
      xlab = "Total number of steps" )
-dev.off()
+```
+
+![](PA1_template_files/figure-html/newhistogram-1.png)<!-- -->
+
+```r
+# dev.off()
 ```
 <center>
 ![Histogram of new total daily steps](figure/hist2.png)
@@ -291,9 +306,14 @@ g <- ggplot(data = newTimeSeries, aes(x = interval, y=averageStep))
 g <- g + facet_wrap(.~days) + geom_line() + theme_bw()
 g <- g + labs(x = "5-minute time interval", y = "Average number of steps") 
 g <- g + labs(title = "Average number of steps across all weekdays & weekend")
-png("./figure/timeseries2.png")
+# png("./figure/timeseries2.png")
 plot(g)
-dev.off()
+```
+
+![](PA1_template_files/figure-html/finalplot-1.png)<!-- -->
+
+```r
+# dev.off()
 ```
 
 <center>
